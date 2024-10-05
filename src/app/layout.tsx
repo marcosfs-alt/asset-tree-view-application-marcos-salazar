@@ -1,9 +1,9 @@
-import type { Metadata } from "next";
-import "./globals.css";
+import type { Metadata } from 'next';
+import './globals.css';
 
 export const metadata: Metadata = {
-  title: "Tractian - Tree View",
-  description: "Tree View Application that shows companies Assets",
+  title: 'Tractian - Tree View',
+  description: 'Tree View Application for Companies Assets',
 };
 
 export default function RootLayout({
@@ -13,9 +13,10 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body
-      >
-        {children}
+      <body>
+        <header></header>
+        <main>{children}</main>
+        <footer></footer>
       </body>
     </html>
   );
