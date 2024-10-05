@@ -16,7 +16,7 @@ export default function RootLayout({
     <html lang="en">
       <body>
         <header className="bg-tracBlue h-[48px] static lg:fixed w-screen">
-          <div className="px-14 py-[17px]">
+          <div className="px-4 py-[17px]">
             <Logo width={102} height={14} />
           </div>
         </header>
