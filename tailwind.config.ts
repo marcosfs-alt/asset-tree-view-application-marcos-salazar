@@ -12,6 +12,8 @@ const config: Config = {
         background: 'var(--background)',
         foreground: 'var(--foreground)',
         tracBlue: '#17192D',
+        blue900: '#023B78',
+        blue500: '#2188FF',
       },
     },
   },

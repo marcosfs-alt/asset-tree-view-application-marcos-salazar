@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import './globals.css';
 import Logo from '@/../public/assets/icons/logo.svg';
+import Companies from '@/components/Header/Companies';
 
 export const metadata: Metadata = {
   title: 'Tractian - Tree View',
@@ -15,9 +16,10 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body>
-        <header className="bg-tracBlue h-[48px] static lg:fixed w-screen">
-          <div className="px-4 py-[17px]">
+        <header className="bg-tracBlue h-[48px] w-full">
+          <div className="px-4 h-full flex items-center justify-between">
             <Logo width={102} height={14} />
+            <Companies />
           </div>
         </header>
         <main>{children}</main>
