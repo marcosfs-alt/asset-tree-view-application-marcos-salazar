@@ -12,7 +12,7 @@ describe('ButtonCompany Component', () => {
     (useSelectedLayoutSegments as jest.Mock).mockReturnValue([]);
 
     const { getByRole } = render(
-      <ButtonCompany companyName="Apex Unit" companyId="apex-unit" />
+      <ButtonCompany companyName="Apex Unit" companyId="apex-unit" />,
     );
 
     const linkElement = getByRole('link', { name: /Apex Unit/i });
@@ -23,7 +23,7 @@ describe('ButtonCompany Component', () => {
     (useSelectedLayoutSegments as jest.Mock).mockReturnValue(['apex-unit']);
 
     const { getByRole } = render(
-      <ButtonCompany companyName="Apex Unit" companyId="apex-unit" />
+      <ButtonCompany companyName="Apex Unit" companyId="apex-unit" />,
     );
 
     const linkElement = getByRole('link', { name: /Apex Unit/i });

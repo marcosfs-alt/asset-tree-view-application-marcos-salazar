@@ -22,7 +22,7 @@ export default function RootLayout({
             <Companies />
           </div>
         </header>
-        <main>{children}</main>
+        <main className="w-full h-[calc(100vh-48px)]">{children}</main>
         <footer></footer>
       </body>
     </html>

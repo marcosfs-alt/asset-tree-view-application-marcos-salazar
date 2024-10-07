@@ -10,12 +10,12 @@ const ButtonCompany = ({
   companyId: string;
 }) => {
   const segments = useSelectedLayoutSegments();
-  const isActive: boolean = segments.includes(companyId);
+  const isActive: boolean = segments[segments.length - 1] === companyId;
 
   return (
     <Link
       href={`/company/${companyId}`}
-      className={`text-white bg-blue900 lg:w-[95px] lg:h-[24px] lg:font-semibold lg:text-xs lg:py-1 lg:px-4 lg:rounded-sm flex justify-center items-center gap-x-2 hover:bg-blue500 ${isActive ? 'bg-blue500' : ''}`}
+      className={`text-white lg:w-[95px] lg:h-[24px] lg:font-semibold lg:text-xs lg:py-1 lg:px-4 lg:rounded-sm flex justify-center items-center gap-x-2 hover:bg-blue500 ${isActive ? 'bg-blue500' : 'bg-blue900'}`}
     >
       <CompanyIcon />
       {companyName}
