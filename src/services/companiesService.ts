@@ -1,4 +1,4 @@
-import { Company } from '@/types/Company';
+import { Company } from '@/types';
 import api from '@/utils/api';
 
 export const fetchCompanies = async (): Promise<Company[]> => {

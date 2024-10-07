@@ -2,8 +2,8 @@
 
 import { useEffect, useState } from 'react';
 import ButtonCompany from './ButtonCompany';
-import { Company } from '@/types/Company';
 import { fetchCompanies } from '@/services/companiesService';
+import { Company } from '@/types';
 
 const Companies = () => {
   const [companies, setCompanies] = useState<Company[]>([]);
