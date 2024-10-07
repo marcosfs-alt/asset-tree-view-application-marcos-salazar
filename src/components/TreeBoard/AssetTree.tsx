@@ -54,7 +54,30 @@ const AssetTree = ({
     ));
   };
 
-  return <>{renderTree()}</>;
+  const renderIsolatedAssets = () => {
+    const isolatedAssets = assets.filter(
+      (asset) => !asset.locationId && !asset.parentId,
+    );
+
+    return isolatedAssets.map((asset) => (
+      <TreeNode
+        key={asset.id}
+        name={asset.name}
+        isLeaf
+        onClick={() => setSelectedItem(asset)}
+        selected={asset.id === selectedItem?.id}
+      >
+        <div className="pl-4">{asset.name}</div>
+      </TreeNode>
+    ));
+  };
+
+  return (
+    <>
+      {renderTree()}
+      {renderIsolatedAssets()}
+    </>
+  );
 };
 
 export default AssetTree;

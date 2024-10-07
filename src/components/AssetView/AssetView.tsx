@@ -12,7 +12,7 @@ const AssetView = () => {
     <section className="w-full h-full flex-col">
       {!!selectedItem ? (
         <>
-          <header className="h-14 border-b border-gray150 text-lg font-semibold text-gray950 py-3">
+          <header className="h-14 border-b border-gray150 text-lg font-semibold text-gray950 py-3 px-4">
             {selectedItem.name}
           </header>
           <main className="w-full h-full flex-col">
