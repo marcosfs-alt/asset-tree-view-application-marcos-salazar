@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import Company from '@/../../public/assets/icons/company.svg';
+import CompanyIcon from '@/../../public/assets/icons/company.svg';
 import { useSelectedLayoutSegments } from 'next/navigation';
 
 const ButtonCompany = ({
@@ -17,7 +17,7 @@ const ButtonCompany = ({
       href={`/company/${companyId}`}
       className={`text-white bg-blue900 lg:w-[95px] lg:h-[24px] lg:font-semibold lg:text-xs lg:py-1 lg:px-4 lg:rounded-sm flex justify-center items-center gap-x-2 hover:bg-blue500 ${isActive ? 'bg-blue500' : ''}`}
     >
-      <Company />
+      <CompanyIcon />
       {companyName}
     </Link>
   );
