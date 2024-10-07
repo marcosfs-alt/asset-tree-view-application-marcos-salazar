@@ -41,17 +41,23 @@ const AssetTree = ({
       return null;
     }
 
-    return filteredAssets.map((asset) => (
-      <TreeNode
-        key={asset.id}
-        name={asset.name}
-        isLeaf={!assets.some((child) => child.parentId === asset.id)}
-        onClick={() => setSelectedItem(asset)}
-        selected={asset.id === selectedItem?.id}
-      >
-        {renderAssets(asset.id)}
-      </TreeNode>
-    ));
+    return filteredAssets.map((asset) => {
+      const isLeaf = asset.sensorType
+        ? true
+        : !assets.some((child) => child.parentId === asset.id);
+
+      return (
+        <TreeNode
+          key={asset.id}
+          name={asset.name}
+          isLeaf={isLeaf}
+          onClick={() => setSelectedItem(asset)}
+          selected={asset.id === selectedItem?.id}
+        >
+          {renderAssets(asset.id)}
+        </TreeNode>
+      );
+    });
   };
 
   const renderIsolatedAssets = () => {
