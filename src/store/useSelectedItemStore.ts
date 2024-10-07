@@ -1,10 +1,10 @@
-import { SelectedItemState } from '@/types';
+import { Asset, SelectedItemState } from '@/types';
 import { create } from 'zustand';
 
 const useSelectedItemStore = create<SelectedItemState>(
   (set: (partial: Partial<SelectedItemState>) => void) => ({
     selectedItem: null,
-    setSelectedItem: (itemId: string) => set({ selectedItem: itemId }),
+    setSelectedItem: (asset: Asset) => set({ selectedItem: asset }),
   }),
 );
 

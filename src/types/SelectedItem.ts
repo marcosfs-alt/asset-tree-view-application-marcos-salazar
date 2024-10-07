@@ -1,4 +1,6 @@
+import { Asset } from '.';
+
 export interface SelectedItemState {
-  selectedItem: string | null;
-  setSelectedItem: (itemId: string) => void;
+  selectedItem: Asset | null;
+  setSelectedItem: (asset: Asset) => void;
 }

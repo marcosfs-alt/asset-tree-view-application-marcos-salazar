@@ -7,4 +7,5 @@ export interface Asset {
   status?: string;
   gatewayId?: string;
   locationId?: string;
+  image?: string;
 }

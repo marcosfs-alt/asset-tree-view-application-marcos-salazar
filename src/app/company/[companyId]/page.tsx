@@ -1,3 +1,4 @@
+import AssetView from '@/components/AssetView/AssetView';
 import AssetTree from '@/components/TreeBoard/AssetTree';
 import { fetchAssets, fetchLocations } from '@/services/companiesService';
 
@@ -34,7 +35,9 @@ export default async function Page({
           <section className="border border-borderCard w-1/3 h-full text-black overflow-scroll">
             <AssetTree locations={locations} assets={assets} />
           </section>
-          <section className="border border-borderCard w-2/3 h-full"></section>
+          <section className="border border-borderCard w-2/3 h-full">
+            <AssetView />
+          </section>
         </section>
       </div>
     </div>

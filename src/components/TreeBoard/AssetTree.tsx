@@ -46,8 +46,8 @@ const AssetTree = ({
         key={asset.id}
         name={asset.name}
         isLeaf={!assets.some((child) => child.parentId === asset.id)}
-        onClick={() => setSelectedItem(asset.id)}
-        selected={asset.id === selectedItem}
+        onClick={() => setSelectedItem(asset)}
+        selected={asset.id === selectedItem?.id}
       >
         {renderAssets(asset.id)}
       </TreeNode>
