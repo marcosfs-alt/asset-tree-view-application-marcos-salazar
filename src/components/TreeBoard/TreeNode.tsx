@@ -1,6 +1,7 @@
 'use client';
 
 import { TreeNodeProp } from '@/types';
+import Image from 'next/image';
 import { useState } from 'react';
 
 const TreeNode = ({
@@ -9,6 +10,7 @@ const TreeNode = ({
   isLeaf,
   onClick,
   selected,
+  type,
 }: TreeNodeProp) => {
   const [isExpanded, setIsExpanded] = useState(false);
 
@@ -28,8 +30,15 @@ const TreeNode = ({
 
   return (
     <div className={`pl-2 ${selected ? 'bg-blue500 text-white' : ''}`}>
-      <div className="cursor-pointer" onClick={handleClick}>
-        {!isLeaf ? (isExpanded ? '▼' : '►') : ''} {name}
+      <div className="cursor-pointer flex gap-x-0.5" onClick={handleClick}>
+        {!isLeaf ? (isExpanded ? '▼' : '►') : ''}
+        <Image
+          src={`/assets/icons/${type}.svg`}
+          alt="blue color icon"
+          width={22}
+          height={22}
+        />
+        {name}
       </div>
       {isExpanded && children && <div className="pl-4">{children}</div>}
     </div>

@@ -4,4 +4,5 @@ export interface TreeNodeProp {
   isLeaf?: boolean;
   onClick?: () => void;
   selected?: boolean;
+  type: string;
 }

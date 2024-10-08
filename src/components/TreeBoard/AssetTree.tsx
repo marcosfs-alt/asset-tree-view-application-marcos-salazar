@@ -3,6 +3,7 @@
 import TreeNode from '@/components/TreeBoard/TreeNode';
 import { Location, Asset } from '@/types';
 import useSelectedItemStore from '@/store/useSelectedItemStore';
+import { getItemType } from '@/utils/itemClassifier';
 
 const AssetTree = ({
   locations,
@@ -25,7 +26,7 @@ const AssetTree = ({
     }
 
     return filteredLocations.map((location) => (
-      <TreeNode key={location.id} name={location.name}>
+      <TreeNode key={location.id} name={location.name} type="location">
         {renderAssets(location.id)}
         {renderTree(location.id)}
       </TreeNode>
@@ -42,6 +43,7 @@ const AssetTree = ({
     }
 
     return filteredAssets.map((asset) => {
+      const itemType = getItemType(asset);
       const isLeaf = asset.sensorType
         ? true
         : !assets.some((child) => child.parentId === asset.id);
@@ -53,8 +55,9 @@ const AssetTree = ({
           isLeaf={isLeaf}
           onClick={() => setSelectedItem(asset)}
           selected={asset.id === selectedItem?.id}
+          type={itemType}
         >
-          {renderAssets(asset.id)}
+          {itemType === 'asset' && renderAssets(asset.id)}
         </TreeNode>
       );
     });
@@ -65,17 +68,21 @@ const AssetTree = ({
       (asset) => !asset.locationId && !asset.parentId,
     );
 
-    return isolatedAssets.map((asset) => (
-      <TreeNode
-        key={asset.id}
-        name={asset.name}
-        isLeaf
-        onClick={() => setSelectedItem(asset)}
-        selected={asset.id === selectedItem?.id}
-      >
-        <div className="pl-4">{asset.name}</div>
-      </TreeNode>
-    ));
+    return isolatedAssets.map((asset) => {
+      const itemType = getItemType(asset);
+      return (
+        <TreeNode
+          key={asset.id}
+          name={asset.name}
+          isLeaf
+          onClick={() => setSelectedItem(asset)}
+          selected={asset.id === selectedItem?.id}
+          type={itemType}
+        >
+          {itemType === 'asset' && renderAssets(asset.id)}
+        </TreeNode>
+      );
+    });
   };
 
   return (
