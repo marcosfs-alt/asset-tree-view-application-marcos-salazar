@@ -56,6 +56,8 @@ const AssetTree = ({
           onClick={() => setSelectedItem(asset)}
           selected={asset.id === selectedItem?.id}
           type={itemType}
+          sensorType={asset.sensorType}
+          status={asset.status}
         >
           {itemType === 'asset' && renderAssets(asset.id)}
         </TreeNode>
@@ -78,6 +80,8 @@ const AssetTree = ({
           onClick={() => setSelectedItem(asset)}
           selected={asset.id === selectedItem?.id}
           type={itemType}
+          sensorType={asset.sensorType}
+          status={asset.status}
         >
           {itemType === 'asset' && renderAssets(asset.id)}
         </TreeNode>

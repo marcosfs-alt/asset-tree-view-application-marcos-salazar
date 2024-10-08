@@ -5,4 +5,6 @@ export interface TreeNodeProp {
   onClick?: () => void;
   selected?: boolean;
   type: string;
+  sensorType?: string;
+  status?: string;
 }

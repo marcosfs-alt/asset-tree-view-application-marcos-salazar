@@ -1,8 +1,9 @@
 'use client';
 
-import { TreeNodeProp } from '@/types';
+import { TreeNodeProp, sensorStatus, sensorTypes } from '@/types';
 import Image from 'next/image';
 import ArrowDown from '@/../../public/assets/icons/arrowDown.svg';
+import EnergyIcon from '@/../../public/assets/icons/bolt.svg';
 import { useState } from 'react';
 
 const TreeNode = ({
@@ -12,6 +13,8 @@ const TreeNode = ({
   onClick,
   selected,
   type,
+  sensorType,
+  status,
 }: TreeNodeProp) => {
   const [isExpanded, setIsExpanded] = useState(false);
 
@@ -47,11 +50,21 @@ const TreeNode = ({
         <Image
           src={`/assets/icons/${type}.svg`}
           alt="blue color icon"
-          className={`${selected ? 'filter invert sepia brightness-0 saturate-100 hue-rotate-180' : ' '}`}
+          className={`${!selected ? 'fill-white' : 'fill-blue500'}`}
           width={22}
           height={22}
         />
         {name}
+        {isLeaf &&
+          (sensorType === sensorTypes.E ? (
+            <EnergyIcon
+              className={`filter ${status === sensorStatus.OPR ? 'fill-defaultGreen' : 'fill-defaultRed'}`}
+            />
+          ) : (
+            <div
+              className={`w-2 h-2 rounded-full ${status === sensorStatus.OPR ? 'bg-defaultGreen' : 'bg-defaultRed'}`}
+            ></div>
+          ))}
       </div>
       {isExpanded && children && <div className="pl-4">{children}</div>}
     </div>

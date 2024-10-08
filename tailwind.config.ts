@@ -11,6 +11,8 @@ const config: Config = {
       colors: {
         background: 'var(--background)',
         foreground: 'var(--foreground)',
+        defaultGreen: '#52C41A',
+        defaultRed: '#ED3833',
         tracBlue: '#17192D',
         black600: '#17192D',
         blue50: '#F2F8FF',
