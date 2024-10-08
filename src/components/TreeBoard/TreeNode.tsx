@@ -1,9 +1,10 @@
 'use client';
 
-import { TreeNodeProp, sensorStatus, sensorTypes } from '@/types';
+import { Items, TreeNodeProp, sensorStatus, sensorTypes } from '@/types';
 import Image from 'next/image';
 import ArrowDown from '@/../../public/assets/icons/arrowDown.svg';
 import EnergyIcon from '@/../../public/assets/icons/bolt.svg';
+import ComponentIcon from '@/../../public/assets/icons/component.svg';
 import { useState } from 'react';
 
 const TreeNode = ({
@@ -47,15 +48,24 @@ const TreeNode = ({
         ) : (
           ''
         )}
-        <Image
-          src={`/assets/icons/${type}.svg`}
-          alt="blue color icon"
-          className={`${!selected ? 'fill-white' : 'fill-blue500'}`}
-          width={22}
-          height={22}
-        />
+        {type === Items.CPT ? (
+          <ComponentIcon
+            className={`${!selected ? 'fill-blue500' : 'fill-white'}`}
+            width={22}
+            height={22}
+          />
+        ) : (
+          <Image
+            src={`/assets/icons/${type}.svg`}
+            alt="blue color icon"
+            className={`${!selected ? 'fill-white' : 'fill-blue500'}`}
+            width={22}
+            height={22}
+          />
+        )}
         {name}
         {isLeaf &&
+          !!sensorType &&
           (sensorType === sensorTypes.E ? (
             <EnergyIcon
               className={`filter ${status === sensorStatus.OPR ? 'fill-defaultGreen' : 'fill-defaultRed'}`}

@@ -1,5 +1,4 @@
-import { Company } from '@/types';
-import { SelectedCompany } from '@/types/SelectedCompany';
+import { Company, SelectedCompany } from '@/types';
 import { create } from 'zustand';
 
 const useCompanyStore = create<SelectedCompany>((set) => ({
