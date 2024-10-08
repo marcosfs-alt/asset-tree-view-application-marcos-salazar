@@ -35,6 +35,7 @@ const TreeNode = ({
         <Image
           src={`/assets/icons/${type}.svg`}
           alt="blue color icon"
+          className={`${selected ? 'filter invert sepia brightness-0 saturate-100 hue-rotate-180' : ' '}`}
           width={22}
           height={22}
         />
