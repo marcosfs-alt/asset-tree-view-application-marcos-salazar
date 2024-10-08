@@ -1,12 +1,12 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import ButtonCompany from './ButtonCompany';
 import { fetchCompanies } from '@/services/companiesService';
-import { Company } from '@/types';
+import useCompanyStore from '@/store/useCompanyStore';
 
 const Companies = () => {
-  const [companies, setCompanies] = useState<Company[]>([]);
+  const { companies, setCompanies } = useCompanyStore();
 
   useEffect(() => {
     const getCompanies = async () => {
@@ -22,7 +22,7 @@ const Companies = () => {
       localStorage.setItem('companies', JSON.stringify(data));
     };
     getCompanies();
-  }, []);
+  }, [setCompanies]);
 
   return (
     <nav className="w-fit">
