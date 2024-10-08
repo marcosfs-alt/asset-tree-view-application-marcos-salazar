@@ -2,6 +2,7 @@
 
 import { TreeNodeProp } from '@/types';
 import Image from 'next/image';
+import ArrowDown from '@/../../public/assets/icons/arrowDown.svg';
 import { useState } from 'react';
 
 const TreeNode = ({
@@ -30,8 +31,19 @@ const TreeNode = ({
 
   return (
     <div className={`pl-2 ${selected ? 'bg-blue500 text-white' : ''}`}>
-      <div className="cursor-pointer flex gap-x-0.5" onClick={handleClick}>
-        {!isLeaf ? (isExpanded ? '▼' : '►') : ''}
+      <div
+        className="cursor-pointer flex gap-[4px] flex items-center"
+        onClick={handleClick}
+      >
+        {!isLeaf ? (
+          isExpanded ? (
+            <ArrowDown />
+          ) : (
+            <ArrowDown className="rotate-[270deg]" />
+          )
+        ) : (
+          ''
+        )}
         <Image
           src={`/assets/icons/${type}.svg`}
           alt="blue color icon"
