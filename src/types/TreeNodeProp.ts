@@ -7,4 +7,5 @@ export interface TreeNodeProp {
   type: string;
   sensorType?: string;
   status?: string;
+  onExpand?: (() => Promise<void>) | undefined;
 }

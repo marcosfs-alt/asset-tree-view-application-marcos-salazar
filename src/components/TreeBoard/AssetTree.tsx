@@ -1,71 +1,125 @@
 'use client';
 
 import TreeNode from '@/components/TreeBoard/TreeNode';
+import { Location, Asset } from '@/types';
 import useSelectedItemStore from '@/store/useSelectedItemStore';
-import { AssetTreeProps } from '@/types';
-import { createDataIndex } from '@/utils/dataIndexer';
+import { useState } from 'react';
 import { getItemType } from '@/utils/itemClassifier';
-import { useEffect, useState } from 'react';
 
-const AssetTree = ({ locations, assets }: AssetTreeProps) => {
+const AssetTree = ({
+  locations,
+  assets,
+}: {
+  locations: Location[];
+  assets: Asset[];
+}) => {
   const { selectedItem, setSelectedItem } = useSelectedItemStore();
-  const [dataIndex, setDataIndex] = useState(
-    createDataIndex(locations, assets),
-  );
+  const [loadedChildren, setLoadedChildren] = useState<{
+    [key: string]: { locations: Location[]; assets: Asset[] };
+  }>({});
 
-  useEffect(() => {
-    setDataIndex(createDataIndex(locations, assets));
-  }, [locations, assets]);
+  const handleExpand = async (parentId: string) => {
+    if (!loadedChildren[parentId]) {
+      const childrenLocations = locations.filter(
+        (loc) => loc.parentId === parentId,
+      );
+      const childrenAssets = assets.filter(
+        (asset) => asset.parentId === parentId || asset.locationId === parentId,
+      );
 
-  const renderTree = (parentId: string = 'root') => {
-    const { locations: childLocations, assets: childAssets } = dataIndex[
-      parentId
-    ] || {
-      locations: [],
-      assets: [],
-    };
-
-    const nodes = [
-      ...childLocations.map((location) => (
-        <TreeNode
-          key={location.id}
-          name={location.name}
-          isLeaf={false}
-          type="location"
-          onClick={() => setSelectedItem(location)}
-          selected={location.id === selectedItem?.id}
-        >
-          {renderTree(location.id)}
-        </TreeNode>
-      )),
-      ...childAssets.map((asset) => {
-        const isLeaf = asset.sensorType
-          ? true
-          : !assets.some((child) => child.parentId === asset.id);
-
-        const itemType = getItemType(asset);
-
-        return (
-          <TreeNode
-            key={asset.id}
-            name={asset.name}
-            isLeaf={isLeaf}
-            type={itemType}
-            onClick={() => setSelectedItem(asset)}
-            selected={asset.id === selectedItem?.id}
-            sensorType={asset.sensorType}
-            status={asset.status}
-          >
-            {!isLeaf && renderTree(asset.id)}
-          </TreeNode>
-        );
-      }),
-    ];
-
-    return nodes.length > 0 ? nodes : null;
+      setLoadedChildren((prev) => ({
+        ...prev,
+        [parentId]: {
+          locations: childrenLocations,
+          assets: childrenAssets,
+        },
+      }));
+    }
   };
 
-  return <>{renderTree()}</>;
+  const renderTree = (locationId?: string) => {
+    const filteredLocations = locations.filter((location) =>
+      locationId
+        ? location.parentId === locationId
+        : location.parentId === null,
+    );
+
+    if (filteredLocations.length === 0) {
+      return null;
+    }
+
+    return filteredLocations.map((location) => (
+      <TreeNode
+        key={location.id}
+        name={location.name}
+        type="location"
+        isLeaf={false}
+        onExpand={() => handleExpand(location.id)}
+      >
+        {loadedChildren[location.id] ? (
+          <>
+            {renderAssets(location.id)}
+            {renderTree(location.id)}
+          </>
+        ) : null}
+      </TreeNode>
+    ));
+  };
+
+  const renderAssets = (parentId: string) => {
+    if (!loadedChildren[parentId]) return null;
+
+    const { assets: filteredAssets } = loadedChildren[parentId];
+
+    return filteredAssets.map((asset) => {
+      const isLeaf = asset.sensorType
+        ? true
+        : !assets.some((child) => child.parentId === asset.id);
+      const itemType = getItemType(asset);
+
+      return (
+        <TreeNode
+          key={asset.id}
+          name={asset.name}
+          isLeaf={isLeaf}
+          onClick={() => setSelectedItem(asset)}
+          selected={asset.id === selectedItem?.id}
+          type={itemType}
+          sensorType={asset.sensorType}
+          status={asset.status}
+          onExpand={!isLeaf ? () => handleExpand(asset.id) : undefined}
+        >
+          {!isLeaf && loadedChildren[asset.id] && renderAssets(asset.id)}
+        </TreeNode>
+      );
+    });
+  };
+
+  const renderIsolatedAssets = () => {
+    const isolatedAssets = assets.filter(
+      (asset) => !asset.locationId && !asset.parentId,
+    );
+
+    return isolatedAssets.map((asset) => (
+      <TreeNode
+        key={asset.id}
+        name={asset.name}
+        isLeaf
+        onClick={() => setSelectedItem(asset)}
+        selected={asset.id === selectedItem?.id}
+        sensorType={asset.sensorType}
+        status={asset.status}
+        type="component"
+      />
+    ));
+  };
+
+  return (
+    <>
+      {renderTree()}
+      {renderIsolatedAssets()}
+    </>
+  );
 };
 
 export default AssetTree;
