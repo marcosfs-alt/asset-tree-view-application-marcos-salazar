@@ -5,7 +5,7 @@ import Image from 'next/image';
 import ArrowDown from '@/../../public/assets/icons/arrowDown.svg';
 import EnergyIcon from '@/../../public/assets/icons/bolt.svg';
 import ComponentIcon from '@/../../public/assets/icons/component.svg';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 const TreeNode = ({
   name,
@@ -16,9 +16,14 @@ const TreeNode = ({
   type,
   sensorType,
   status,
+  expanded,
   onExpand,
 }: TreeNodeProp) => {
-  const [isExpanded, setIsExpanded] = useState(false);
+  const [isExpanded, setIsExpanded] = useState(expanded || false);
+
+  useEffect(() => {
+    setIsExpanded(expanded || false);
+  }, [expanded]);
 
   const toggleExpanded = () => {
     if (!isLeaf) {
@@ -61,7 +66,7 @@ const TreeNode = ({
         ) : (
           <Image
             src={`/assets/icons/${type}.svg`}
-            alt="blue color icon"
+            alt="icon"
             className={`${!selected ? 'fill-white' : 'fill-blue500'}`}
             width={22}
             height={22}
@@ -72,11 +77,19 @@ const TreeNode = ({
           !!sensorType &&
           (sensorType === sensorTypes.E ? (
             <EnergyIcon
-              className={`filter ${status === sensorStatus.OPR ? 'fill-defaultGreen' : 'fill-defaultRed'}`}
+              className={`filter ${
+                status === sensorStatus.OPR
+                  ? 'fill-defaultGreen'
+                  : 'fill-defaultRed'
+              }`}
             />
           ) : (
             <div
-              className={`w-2 h-2 rounded-full ${status === sensorStatus.OPR ? 'bg-defaultGreen' : 'bg-defaultRed'}`}
+              className={`w-2 h-2 rounded-full ${
+                status === sensorStatus.OPR
+                  ? 'bg-defaultGreen'
+                  : 'bg-defaultRed'
+              }`}
             ></div>
           ))}
       </div>
