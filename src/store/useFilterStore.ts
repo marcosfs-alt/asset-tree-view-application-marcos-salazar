@@ -1,4 +1,3 @@
-// src/store/useFilterStore.ts
 import { AssetTreeFilterProps } from '@/types';
 import { create } from 'zustand';
 

@@ -26,7 +26,7 @@ git clone [repository URL]
 Navigate to the project directory:
 
 ```bash
-cd asset-tree-view-application
+cd asset-tree-view-application-marcos-salazar
 ```
 
 Install dependencies:
