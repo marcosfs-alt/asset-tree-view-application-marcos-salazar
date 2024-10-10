@@ -1,5 +1,3 @@
-'use client';
-
 import { Items, TreeNodeProp, sensorStatus, sensorTypes } from '@/types';
 import Image from 'next/image';
 import ArrowDown from '@/../../public/assets/icons/arrowDown.svg';
@@ -18,6 +16,7 @@ const TreeNode = ({
   status,
   expanded,
   onExpand,
+  disableCollapse,
 }: TreeNodeProp) => {
   const [isExpanded, setIsExpanded] = useState(expanded || false);
 
@@ -26,7 +25,7 @@ const TreeNode = ({
   }, [expanded]);
 
   const toggleExpanded = () => {
-    if (!isLeaf) {
+    if (!isLeaf && !disableCollapse) {
       setIsExpanded((curr) => !curr);
       if (!isExpanded && onExpand) {
         onExpand();

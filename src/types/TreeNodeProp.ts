@@ -9,4 +9,5 @@ export interface TreeNodeProp {
   status?: string;
   expanded?: boolean;
   onExpand?: (() => void) | (() => Promise<void>);
+  disableCollapse?: boolean;
 }

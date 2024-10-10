@@ -60,10 +60,14 @@ const AssetTree = ({
 
   const shouldShowLocation = useCallback(
     (location: Location): boolean => {
-      const matchesSearchTerm = () =>
-        searchTerm
-          ? location.name.toLowerCase().includes(searchTerm.toLowerCase())
-          : true;
+      const anyFilterApplied =
+        !!searchTerm || showEnergySensorsOnly || showCriticalStatusOnly;
+
+      if (!anyFilterApplied) return true;
+
+      const matchesSearchTerm = searchTerm
+        ? location.name.toLowerCase().includes(searchTerm.toLowerCase())
+        : false;
 
       const assetsInLocation = assets.filter(
         (asset) =>
@@ -77,11 +81,12 @@ const AssetTree = ({
       );
 
       return (
-        matchesSearchTerm() ||
+        matchesSearchTerm ||
         assetsInLocation.length > 0 ||
         childLocations.length > 0
       );
     },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [searchTerm, assets, locations, shouldShowAsset],
   );
 
@@ -89,11 +94,12 @@ const AssetTree = ({
     (parentId: string) => {
       if (!loadedChildren[parentId]) {
         const childrenLocations = locations.filter(
-          (loc) => loc.parentId === parentId,
+          (loc) => loc.parentId === parentId && shouldShowLocation(loc),
         );
         const childrenAssets = assets.filter(
           (asset) =>
-            asset.parentId === parentId || asset.locationId === parentId,
+            (asset.parentId === parentId || asset.locationId === parentId) &&
+            shouldShowAsset(asset),
         );
 
         setLoadedChildren((prev) => ({
@@ -105,7 +111,7 @@ const AssetTree = ({
         }));
       }
     },
-    [assets, locations, loadedChildren],
+    [assets, locations, loadedChildren, shouldShowAsset, shouldShowLocation],
   );
 
   useEffect(() => {
@@ -215,6 +221,7 @@ const AssetTree = ({
         isLeaf={false}
         expanded={expandedNodes.has(location.id)}
         onExpand={() => handleExpand(location.id)}
+        disableCollapse={!!(expandedNodes.has(location.id) && anyFilterApplied)}
       >
         {loadedChildren[location.id] && (
           <>
@@ -249,6 +256,9 @@ const AssetTree = ({
             status={asset.status}
             expanded={expandedNodes.has(asset.id)}
             onExpand={!isLeaf ? () => handleExpand(asset.id) : undefined}
+            disableCollapse={
+              !!(expandedNodes.has(asset.id) && anyFilterApplied)
+            }
           >
             {!isLeaf && loadedChildren[asset.id] && renderAssets(asset.id)}
           </TreeNode>
