@@ -19,7 +19,7 @@ export default async function Page({
       <div className="flex flex-col border-2 border-borderCard rounded lg:w-full lg:h-full p-4 gap-y-3 overflow-hidden">
         <BoardHeader companyId={companyId} />
         <section className="flex gap-2 w-full h-full overflow-hidden">
-          <section className="border border-borderCard w-1/3 h-full text-black overflow-scroll">
+          <section className="border border-borderCard w-1/3 h-full text-black overflow-scroll no-scrollbar">
             <AssetTreeFilter />
             <AssetTree locations={locations} assets={assets} />
           </section>
