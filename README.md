@@ -1,36 +1,107 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Asset Tree View Application
 
-## Getting Started
+This project was made based on tractian's front end software engineer test. This Project consists in a Tree View Application that displays the assets of different companies, including their locations, assets, and components. It allows users to visualize the hierarchy of assets in a tree structure, apply filters, and view details of specific items.
 
-First, run the development server:
+## Demo Video
+
+[]
+
+## Features
+
+- **Dynamic Tree Visualization**: Displays a hierarchical tree structure of companies' assets, including locations, assets, sub-assets, and components.
+- **Search Filter**: Allows users to search for specific components, assets, or locations within the asset hierarchy.
+- **Energy Sensors Filter**: Users can filter the tree to show only energy sensors.
+- **Critical Sensor Status Filter**: Users can filter the tree to identify assets with critical sensor status.
+- **Parent Visibility**: When filters are applied, parent items remain visible to maintain the context of the asset path.
+- **Detail View**: Clicking on an item displays detailed information about it.
+
+## Installation and Setup
+
+Clone the repository:
+
+```bash
+git clone [repository URL]
+```
+
+Navigate to the project directory:
+
+```bash
+cd asset-tree-view-application
+```
+
+Install dependencies:
+
+```bash
+npm install
+# or
+yarn install
+```
+
+Run the application:
 
 ```bash
 npm run dev
 # or
 yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Access the application:
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Open your browser and navigate to [http://localhost:3000](http://localhost:3000).
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## How to Use
 
-## Learn More
+- **Select a Company**: On the homepage, select one of the available companies to view its assets.
 
-To learn more about Next.js, take a look at the following resources:
+- **Navigate the Tree**:
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+  - Expand and collapse nodes to explore locations, assets, and components.
+  - Components are represented with specific icons.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+- **Apply Filters**:
 
-## Deploy on Vercel
+  - **Search Filter**: Use the search bar to find items by name.
+  - **Energy Sensors Filter**: Toggle to show only energy sensors.
+  - **Critical Status Filter**: Toggle to show assets with critical sensor status.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+- **View Details**:
+  - Click on a component or asset to view detailed information.
+  - Details include equipment type, responsible person, sensor information, etc.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Improvements
+
+If I had more time to work on this project, I would consider the following improvements:
+
+### Implement Virtualization for the Asset Tree
+
+- **Description**: Use libraries like `react-window` or `react-virtualized` to render only the visible nodes in the tree.
+- **Benefit**: Enhances performance when dealing with large datasets, providing a smoother user experience.
+
+### Add Error Handling and Loading States
+
+- **Description**: Implement loading indicators during data fetching and handle API errors gracefully.
+- **Benefit**: Improves user feedback and experience during data operations.
+
+### Implement a Mobile Version
+
+- **Description**: Add breakpoint and components like an hamburger menu to make a comfortable mobile experience for the user
+- **Benefits**: Improves the user experience
+
+### Increase Test Coverage
+
+- **Description**: Write additional unit and integration tests to cover more components and scenarios.
+- **Benefit**: Ensures reliability and facilitates future maintenance.
+
+### Optimize API Calls
+
+- **Description**: Implement caching strategies and optimize API requests using tools like `SWR`.
+- **Benefit**: Reduces loading times and improves application performance.
+
+## Technologies Used
+
+- **Next.js 13**
+- **React 18**
+- **TypeScript 4.5**
+- **Tailwind CSS**
+- **Zustand for state management**
+- **Jest and React Testing Library for testing**
