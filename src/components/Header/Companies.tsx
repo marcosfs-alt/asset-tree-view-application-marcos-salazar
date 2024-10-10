@@ -5,7 +5,7 @@ import ButtonCompany from './ButtonCompany';
 import { fetchCompanies } from '@/services/companiesService';
 import useCompanyStore from '@/store/useCompanyStore';
 
-const Companies = () => {
+const Companies = ({ setLoading }: { setLoading?: () => void }) => {
   const { companies, setCompanies } = useCompanyStore();
 
   useEffect(() => {
@@ -28,7 +28,7 @@ const Companies = () => {
     <nav className="w-fit">
       <ul className="flex justify-around lg:gap-2">
         {companies.map((company) => (
-          <li key={company.id}>
+          <li key={company.id} onClick={setLoading}>
             <ButtonCompany companyName={company.name} companyId={company.id} />
           </li>
         ))}

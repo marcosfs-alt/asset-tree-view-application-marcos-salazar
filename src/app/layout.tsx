@@ -23,7 +23,6 @@ export default function RootLayout({
           </div>
         </header>
         <main className="w-full h-[calc(100vh-48px)]">{children}</main>
-        <footer></footer>
       </body>
     </html>
   );
