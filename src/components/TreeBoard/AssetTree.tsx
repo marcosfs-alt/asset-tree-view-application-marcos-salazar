@@ -1,7 +1,7 @@
 'use client';
 
 import TreeNode from '@/components/TreeBoard/TreeNode';
-import { Location, Asset } from '@/types';
+import { Location, Asset, sensorStatus, sensorTypes } from '@/types';
 import useSelectedItemStore from '@/store/useSelectedItemStore';
 import useFilterStore from '@/store/useFilterStore';
 import { useState, useEffect, useCallback, useMemo } from 'react';
@@ -26,6 +26,37 @@ const AssetTree = ({
     [loadedChildren],
   );
 
+  const shouldShowAsset = useCallback(
+    (asset: Asset): boolean => {
+      const matchesFilters = (): boolean => {
+        if (showEnergySensorsOnly && asset.sensorType !== sensorTypes.E) {
+          return false;
+        }
+
+        if (showCriticalStatusOnly && asset.status !== sensorStatus.ALT) {
+          return false;
+        }
+
+        if (
+          searchTerm &&
+          !asset.name.toLowerCase().includes(searchTerm.toLowerCase())
+        ) {
+          return false;
+        }
+
+        return true;
+      };
+
+      if (matchesFilters()) {
+        return true;
+      }
+
+      const childAssets = assets.filter((child) => child.parentId === asset.id);
+      return childAssets.some((child) => shouldShowAsset(child));
+    },
+    [searchTerm, showEnergySensorsOnly, showCriticalStatusOnly, assets],
+  );
+
   const handleExpand = useCallback(
     async (parentId: string) => {
       if (!memoizedLoadedChildren[parentId]) {
@@ -44,26 +75,21 @@ const AssetTree = ({
             assets: childrenAssets,
           },
         }));
+
+        childrenAssets.forEach((asset) => {
+          if (shouldShowAsset(asset)) {
+            handleExpand(asset.id);
+          }
+        });
       }
     },
-    [assets, locations, memoizedLoadedChildren, setLoadedChildren],
-  );
-
-  const shouldShowAsset = useCallback(
-    (asset: Asset): boolean => {
-      if (!searchTerm) return true;
-
-      if (showEnergySensorsOnly && asset.sensorType !== 'energy') {
-        return false;
-      }
-
-      if (showCriticalStatusOnly && asset.status !== 'critical') {
-        return false;
-      }
-
-      return asset.name.toLowerCase().includes(searchTerm.toLowerCase());
-    },
-    [searchTerm, showEnergySensorsOnly, showCriticalStatusOnly],
+    [
+      assets,
+      locations,
+      memoizedLoadedChildren,
+      setLoadedChildren,
+      shouldShowAsset,
+    ],
   );
 
   const shouldShowLocation = useCallback(
@@ -74,10 +100,9 @@ const AssetTree = ({
     },
     [searchTerm],
   );
+
   const isAssetInSearchPath = useCallback(
     (assetId: string): boolean => {
-      if (!searchTerm) return true;
-
       const asset = assets.find((asset) => asset.id === assetId);
       if (asset && shouldShowAsset(asset)) {
         return true;
@@ -86,7 +111,7 @@ const AssetTree = ({
       const childAssets = assets.filter((asset) => asset.parentId === assetId);
       return childAssets.some((child) => isAssetInSearchPath(child.id));
     },
-    [assets, searchTerm, shouldShowAsset],
+    [assets, shouldShowAsset],
   );
 
   const isLocationInSearchPath = useCallback(
@@ -151,12 +176,14 @@ const AssetTree = ({
     const { assets: filteredAssets } = memoizedLoadedChildren[parentId];
 
     return filteredAssets
-      .filter(
-        (asset) => shouldShowAsset(asset) || isAssetInSearchPath(asset.id),
-      )
       .map((asset) => {
         const isLeaf = !assets.some((child) => child.parentId === asset.id);
         const itemType = getItemType(asset);
+        const shouldShow = shouldShowAsset(asset);
+
+        if (!shouldShow && isLeaf) {
+          return null;
+        }
 
         return (
           <TreeNode
@@ -168,7 +195,7 @@ const AssetTree = ({
             type={itemType}
             sensorType={asset.sensorType}
             status={asset.status}
-            expanded={isAssetInSearchPath(asset.id)}
+            expanded={isAssetInSearchPath(asset.id) || shouldShow}
             onExpand={!isLeaf ? () => handleExpand(asset.id) : undefined}
           >
             {!isLeaf &&
@@ -176,7 +203,8 @@ const AssetTree = ({
               renderAssets(asset.id)}
           </TreeNode>
         );
-      });
+      })
+      .filter(Boolean);
   };
 
   const renderIsolatedAssets = () => {
@@ -185,9 +213,7 @@ const AssetTree = ({
     );
 
     return isolatedAssets
-      .filter(
-        (asset) => shouldShowAsset(asset) || isAssetInSearchPath(asset.id),
-      )
+      .filter((asset) => shouldShowAsset(asset))
       .map((asset) => (
         <TreeNode
           key={asset.id}
@@ -204,25 +230,38 @@ const AssetTree = ({
   };
 
   useEffect(() => {
-    if (searchTerm) {
-      locations.forEach((location) => {
-        if (isLocationInSearchPath(location.id)) {
-          handleExpand(location.id);
+    const expandRelevantNodes = (nodeId: string) => {
+      handleExpand(nodeId);
+      const childrenAssets = assets.filter(
+        (asset) => asset.parentId === nodeId,
+      );
+      childrenAssets.forEach((asset) => {
+        if (shouldShowAsset(asset)) {
+          expandRelevantNodes(asset.id);
         }
       });
-      assets.forEach((asset) => {
-        if (isAssetInSearchPath(asset.id)) {
-          handleExpand(asset.id);
-        }
-      });
-    }
+    };
+
+    locations.forEach((location) => {
+      if (isLocationInSearchPath(location.id)) {
+        expandRelevantNodes(location.id);
+      }
+    });
+
+    assets.forEach((asset) => {
+      if (shouldShowAsset(asset)) {
+        expandRelevantNodes(asset.id);
+      }
+    });
   }, [
     searchTerm,
+    showEnergySensorsOnly,
+    showCriticalStatusOnly,
     assets,
     locations,
     handleExpand,
-    isAssetInSearchPath,
     isLocationInSearchPath,
+    shouldShowAsset,
   ]);
 
   return (

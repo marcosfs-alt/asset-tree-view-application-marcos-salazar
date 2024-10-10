@@ -1,19 +1,45 @@
 'use client';
 
 import useCompanyStore from '@/store/useCompanyStore';
-import useSelectedItemStore from '@/store/useSelectedItemStore';
-import { sensorStatus, sensorTypes } from '@/types';
 import Bolt from '@/../../public/assets/icons/boltOutlined.svg';
 import Alert from '@/../../public/assets/icons/alert.svg';
+import useFilterStore from '@/store/useFilterStore';
+import { useState } from 'react';
+
+enum buttonType {
+  e = 'energy',
+  c = 'critical',
+}
 
 const BoardHeader = ({ companyId }: { companyId: string }) => {
   const { companies } = useCompanyStore();
-  const { selectedItem } = useSelectedItemStore();
+  const [selectedFilter, setSelectedFilter] = useState<{
+    energyButton: boolean;
+    criticalButton: boolean;
+  }>({ energyButton: false, criticalButton: false });
+  const { setShowCriticalStatusOnly, setShowEnergySensorsOnly } =
+    useFilterStore();
 
-  const [energyItem, criticalStatus] = [
-    selectedItem?.sensorType === sensorTypes.E,
-    selectedItem?.status === sensorStatus.ALT,
-  ];
+  const handleClick = ({ type }: { type: buttonType }) => {
+    setSelectedFilter((current) => {
+      if (type === buttonType.e) {
+        const newEnergyButtonState = !current.energyButton;
+        setShowEnergySensorsOnly(newEnergyButtonState);
+        return {
+          ...current,
+          energyButton: newEnergyButtonState,
+        };
+      } else {
+        const newCriticalButtonState = !current.criticalButton;
+        setShowCriticalStatusOnly(newCriticalButtonState);
+        return {
+          ...current,
+          criticalButton: newCriticalButtonState,
+        };
+      }
+    });
+  };
+
   const selectedCompany = companies.find((company) => company.id === companyId);
 
   return (
@@ -26,20 +52,24 @@ const BoardHeader = ({ companyId }: { companyId: string }) => {
         </p>
       </span>
       <span className="flex gap-2">
-        <div
-          className={`w-[175px] h-[32px] ${!energyItem ? 'bg-white' : 'bg-blue500 text-white'} flex items-center justify-center rounded-[3px] text-gray600 border border-card cursor-pointer gap-0.5`}
+        <button
+          className={`w-[175px] h-[32px] ${!selectedFilter.energyButton ? 'bg-white' : 'bg-blue500 text-white'} flex items-center justify-center rounded-[3px] text-gray600 border border-card cursor-pointer gap-0.5`}
+          onClick={() => handleClick({ type: buttonType.e })}
         >
-          <Bolt className={`${!energyItem ? 'fill-blue500' : 'fill-white'}`} />{' '}
+          <Bolt
+            className={`${!selectedFilter.energyButton ? 'fill-blue500' : 'fill-white'}`}
+          />{' '}
           sensor de energia
-        </div>
-        <div
-          className={`w-[98px] h-[32px] ${!criticalStatus ? 'bg-white' : 'bg-blue500 text-white'} flex items-center justify-center rounded-[3px] text-gray600 border border-card cursor-pointer gap-1`}
+        </button>
+        <button
+          className={`w-[98px] h-[32px] ${!selectedFilter.criticalButton ? 'bg-white' : 'bg-blue500 text-white'} flex items-center justify-center rounded-[3px] text-gray600 border border-card cursor-pointer gap-1`}
+          onClick={() => handleClick({ type: buttonType.c })}
         >
           <Alert
-            className={`${!criticalStatus ? 'fill-blue500' : 'fill-white'}`}
+            className={`${!selectedFilter.criticalButton ? 'fill-blue500' : 'fill-white'}`}
           />{' '}
           critico
-        </div>
+        </button>
       </span>
     </div>
   );
