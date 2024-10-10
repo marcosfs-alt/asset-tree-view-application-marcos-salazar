@@ -4,7 +4,7 @@ This project was made based on tractian's front end software engineer test. This
 
 ## Demo Video
 
-[]
+https://github.com/user-attachments/assets/43e8d63b-dc17-4c86-a758-84d49420cad5
 
 ## Features
 
