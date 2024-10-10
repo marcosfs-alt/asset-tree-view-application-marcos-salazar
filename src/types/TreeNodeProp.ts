@@ -1,11 +1,12 @@
 export interface TreeNodeProp {
   name: string;
   children?: React.ReactNode;
-  isLeaf?: boolean;
+  isLeaf: boolean;
   onClick?: () => void;
   selected?: boolean;
   type: string;
   sensorType?: string;
   status?: string;
-  onExpand?: (() => Promise<void>) | undefined;
+  expanded?: boolean;
+  onExpand?: (() => void) | (() => Promise<void>);
 }

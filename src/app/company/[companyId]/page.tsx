@@ -1,6 +1,7 @@
 import AssetView from '@/components/AssetView/AssetView';
 import BoardHeader from '@/components/BoardHeader.tsx/BoardHeader';
 import AssetTree from '@/components/TreeBoard/AssetTree';
+import AssetTreeFilter from '@/components/TreeBoard/AssetTreeFilter';
 import { fetchAssets, fetchLocations } from '@/services/companiesService';
 
 export default async function Page({
@@ -19,6 +20,7 @@ export default async function Page({
         <BoardHeader companyId={companyId} />
         <section className="flex gap-2 w-full h-full overflow-hidden">
           <section className="border border-borderCard w-1/3 h-full text-black overflow-scroll">
+            <AssetTreeFilter />
             <AssetTree locations={locations} assets={assets} />
           </section>
           <section className="border border-borderCard w-2/3 h-full">

@@ -7,3 +7,4 @@ export * from './SensorType';
 export * from './SelectedCompany';
 export * from './Items';
 export * from './AssetTreeProps';
+export * from './AssetTreeFilterProps';
