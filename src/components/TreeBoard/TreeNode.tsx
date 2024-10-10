@@ -43,7 +43,10 @@ const TreeNode = memo(
     };
 
     return (
-      <div className={`pl-2 ${selected ? 'bg-blue500 text-white' : ''}`}>
+      <div
+        className={`pl-2 ${selected ? 'bg-blue500 text-white' : ''}`}
+        data-testid={`treenode-${name}`}
+      >
         <div
           className="cursor-pointer flex items-center gap-[4px]"
           onClick={handleClick}
