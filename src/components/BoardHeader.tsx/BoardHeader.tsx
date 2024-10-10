@@ -55,20 +55,22 @@ const BoardHeader = ({ companyId }: { companyId: string }) => {
         <button
           className={`w-[175px] h-[32px] ${!selectedFilter.energyButton ? 'bg-white' : 'bg-blue500 text-white'} flex items-center justify-center rounded-[3px] text-gray600 border border-card cursor-pointer gap-0.5`}
           onClick={() => handleClick({ type: buttonType.e })}
+          data-testid="energyButton"
         >
           <Bolt
             className={`${!selectedFilter.energyButton ? 'fill-blue500' : 'fill-white'}`}
           />{' '}
-          sensor de energia
+          <p>sensor de energia</p>
         </button>
         <button
           className={`w-[98px] h-[32px] ${!selectedFilter.criticalButton ? 'bg-white' : 'bg-blue500 text-white'} flex items-center justify-center rounded-[3px] text-gray600 border border-card cursor-pointer gap-1`}
           onClick={() => handleClick({ type: buttonType.c })}
+          data-testid="criticalButton"
         >
           <Alert
             className={`${!selectedFilter.criticalButton ? 'fill-blue500' : 'fill-white'}`}
           />{' '}
-          critico
+          <span>critico</span>
         </button>
       </span>
     </div>
