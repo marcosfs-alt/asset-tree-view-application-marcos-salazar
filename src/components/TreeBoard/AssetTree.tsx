@@ -1,10 +1,10 @@
 'use client';
 
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import TreeNode from '@/components/TreeBoard/TreeNode';
 import { Location, Asset, sensorStatus, sensorTypes } from '@/types';
 import useSelectedItemStore from '@/store/useSelectedItemStore';
 import useFilterStore from '@/store/useFilterStore';
-import { useState, useEffect, useCallback } from 'react';
 import { getItemType } from '@/utils/itemClassifier';
 
 const AssetTree = ({
@@ -18,14 +18,52 @@ const AssetTree = ({
   const { searchTerm, showEnergySensorsOnly, showCriticalStatusOnly } =
     useFilterStore();
 
-  const [loadedChildren, setLoadedChildren] = useState<{
-    [key: string]: { locations: Location[]; assets: Asset[] };
-  }>({});
-
   const [expandedNodes, setExpandedNodes] = useState<Set<string>>(new Set());
 
   const anyFilterApplied =
-    searchTerm || showEnergySensorsOnly || showCriticalStatusOnly;
+    !!searchTerm || showEnergySensorsOnly || showCriticalStatusOnly;
+
+  const assetsById = useMemo(() => {
+    const map = new Map<string, Asset>();
+    assets.forEach((asset) => {
+      map.set(asset.id, asset);
+    });
+    return map;
+  }, [assets]);
+
+  const locationsById = useMemo(() => {
+    const map = new Map<string, Location>();
+    locations.forEach((location) => {
+      map.set(location.id, location);
+    });
+    return map;
+  }, [locations]);
+
+  const childAssetsByParentId = useMemo(() => {
+    const map = new Map<string, Asset[]>();
+    assets.forEach((asset) => {
+      const parentId = asset.parentId || asset.locationId;
+      if (parentId) {
+        if (!map.has(parentId)) {
+          map.set(parentId, []);
+        }
+        map.get(parentId)!.push(asset);
+      }
+    });
+    return map;
+  }, [assets]);
+
+  const childLocationsByParentId = useMemo(() => {
+    const map = new Map<string, Location[]>();
+    locations.forEach((location) => {
+      const parentId = location.parentId || 'root';
+      if (!map.has(parentId)) {
+        map.set(parentId, []);
+      }
+      map.get(parentId)!.push(location);
+    });
+    return map;
+  }, [locations]);
 
   const shouldShowAsset = useCallback(
     (asset: Asset): boolean => {
@@ -52,33 +90,34 @@ const AssetTree = ({
         return true;
       }
 
-      const childAssets = assets.filter((child) => child.parentId === asset.id);
+      const childAssets = childAssetsByParentId.get(asset.id) || [];
       return childAssets.some((child) => shouldShowAsset(child));
     },
-    [searchTerm, showEnergySensorsOnly, showCriticalStatusOnly, assets],
+    [
+      searchTerm,
+      showEnergySensorsOnly,
+      showCriticalStatusOnly,
+      childAssetsByParentId,
+    ],
   );
 
   const shouldShowLocation = useCallback(
     (location: Location): boolean => {
-      const anyFilterApplied =
-        !!searchTerm || showEnergySensorsOnly || showCriticalStatusOnly;
-
-      if (!anyFilterApplied) return true;
+      if (!anyFilterApplied) {
+        return true;
+      }
 
       const matchesSearchTerm = searchTerm
         ? location.name.toLowerCase().includes(searchTerm.toLowerCase())
         : false;
 
-      const assetsInLocation = assets.filter(
-        (asset) =>
-          (asset.locationId === location.id ||
-            asset.parentId === location.id) &&
-          shouldShowAsset(asset),
-      );
+      const assetsInLocation = (
+        childAssetsByParentId.get(location.id) || []
+      ).filter(shouldShowAsset);
 
-      const childLocations = locations.filter(
-        (loc) => loc.parentId === location.id && shouldShowLocation(loc),
-      );
+      const childLocations = (
+        childLocationsByParentId.get(location.id) || []
+      ).filter(shouldShowLocation);
 
       return (
         matchesSearchTerm ||
@@ -86,33 +125,23 @@ const AssetTree = ({
         childLocations.length > 0
       );
     },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [searchTerm, assets, locations, shouldShowAsset],
+    [
+      searchTerm,
+      shouldShowAsset,
+      childAssetsByParentId,
+      childLocationsByParentId,
+      anyFilterApplied,
+    ],
   );
 
-  const handleExpand = useCallback(
-    (parentId: string) => {
-      if (!loadedChildren[parentId]) {
-        const childrenLocations = locations.filter(
-          (loc) => loc.parentId === parentId && shouldShowLocation(loc),
-        );
-        const childrenAssets = assets.filter(
-          (asset) =>
-            (asset.parentId === parentId || asset.locationId === parentId) &&
-            shouldShowAsset(asset),
-        );
-
-        setLoadedChildren((prev) => ({
-          ...prev,
-          [parentId]: {
-            locations: childrenLocations,
-            assets: childrenAssets,
-          },
-        }));
-      }
-    },
-    [assets, locations, loadedChildren, shouldShowAsset, shouldShowLocation],
-  );
+  const handleExpand = useCallback((nodeId: string) => {
+    setExpandedNodes((prev) => {
+      if (prev.has(nodeId)) return prev;
+      const newSet = new Set(prev);
+      newSet.add(nodeId);
+      return newSet;
+    });
+  }, []);
 
   useEffect(() => {
     if (anyFilterApplied) {
@@ -122,8 +151,8 @@ const AssetTree = ({
         let parentId = asset.parentId || asset.locationId;
         while (parentId) {
           newExpandedNodes.add(parentId);
-          const parentAsset = assets.find((a) => a.id === parentId);
-          const parentLocation = locations.find((l) => l.id === parentId);
+          const parentAsset = assetsById.get(parentId);
+          const parentLocation = locationsById.get(parentId);
           parentId =
             parentAsset?.parentId ||
             parentAsset?.locationId ||
@@ -135,7 +164,7 @@ const AssetTree = ({
         let parentId = location.parentId;
         while (parentId) {
           newExpandedNodes.add(parentId);
-          const parentLocation = locations.find((l) => l.id === parentId);
+          const parentLocation = locationsById.get(parentId);
           parentId = parentLocation?.parentId;
         }
       };
@@ -145,15 +174,8 @@ const AssetTree = ({
           if (shouldShowAsset(asset)) {
             newExpandedNodes.add(asset.id);
             expandAssetAncestors(asset);
-            if (asset.parentId) {
-              handleExpand(asset.parentId);
-            } else if (asset.locationId) {
-              handleExpand(asset.locationId);
-            }
           }
-          const childAssets = assets.filter(
-            (child) => child.parentId === asset.id,
-          );
+          const childAssets = childAssetsByParentId.get(asset.id) || [];
           if (childAssets.length > 0) {
             traverseAssets(childAssets);
           }
@@ -165,20 +187,15 @@ const AssetTree = ({
           if (shouldShowLocation(location)) {
             newExpandedNodes.add(location.id);
             expandLocationAncestors(location);
-            handleExpand(location.id);
 
-            const childLocations = locations.filter(
-              (loc) => loc.parentId === location.id,
-            );
+            const childLocations =
+              childLocationsByParentId.get(location.id) || [];
             if (childLocations.length > 0) {
               traverseLocations(childLocations);
             }
 
-            const assetsInLocation = assets.filter(
-              (asset) =>
-                asset.locationId === location.id ||
-                asset.parentId === location.id,
-            );
+            const assetsInLocation =
+              childAssetsByParentId.get(location.id) || [];
             if (assetsInLocation.length > 0) {
               traverseAssets(assetsInLocation);
             }
@@ -186,7 +203,7 @@ const AssetTree = ({
         });
       };
 
-      const rootLocations = locations.filter((loc) => loc.parentId === null);
+      const rootLocations = childLocationsByParentId.get('root') || [];
       traverseLocations(rootLocations);
 
       const isolatedAssets = assets.filter(
@@ -197,51 +214,59 @@ const AssetTree = ({
       setExpandedNodes(newExpandedNodes);
     } else {
       setExpandedNodes(new Set());
-      setLoadedChildren({});
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [searchTerm, showEnergySensorsOnly, showCriticalStatusOnly]);
+  }, [
+    searchTerm,
+    showEnergySensorsOnly,
+    showCriticalStatusOnly,
+    shouldShowAsset,
+    shouldShowLocation,
+    assetsById,
+    locationsById,
+    childAssetsByParentId,
+    childLocationsByParentId,
+    anyFilterApplied,
+    assets,
+  ]);
 
   const renderTree = (locationId?: string) => {
-    const filteredLocations = locations.filter((location) =>
-      locationId
-        ? location.parentId === locationId && shouldShowLocation(location)
-        : location.parentId === null && shouldShowLocation(location),
-    );
+    const locationsToRender = locationId
+      ? childLocationsByParentId.get(locationId) || []
+      : childLocationsByParentId.get('root') || [];
 
-    if (filteredLocations.length === 0) {
-      return null;
-    }
-
-    return filteredLocations.map((location) => (
-      <TreeNode
-        key={location.id}
-        name={location.name}
-        type="location"
-        isLeaf={false}
-        expanded={expandedNodes.has(location.id)}
-        onExpand={() => handleExpand(location.id)}
-        disableCollapse={!!(expandedNodes.has(location.id) && anyFilterApplied)}
-      >
-        {loadedChildren[location.id] && (
-          <>
-            {renderAssets(location.id)}
-            {renderTree(location.id)}
-          </>
-        )}
-      </TreeNode>
-    ));
+    return locationsToRender
+      .filter((location) => shouldShowLocation(location))
+      .map((location) => (
+        <TreeNode
+          key={location.id}
+          name={location.name}
+          type="location"
+          isLeaf={false}
+          expanded={expandedNodes.has(location.id)}
+          onExpand={() => handleExpand(location.id)}
+          disableCollapse={
+            !!(expandedNodes.has(location.id) && anyFilterApplied)
+          }
+        >
+          {expandedNodes.has(location.id) && (
+            <>
+              {renderAssets(location.id)}
+              {renderTree(location.id)}
+            </>
+          )}
+        </TreeNode>
+      ));
   };
 
   const renderAssets = (parentId: string) => {
-    if (!loadedChildren[parentId]) return null;
+    const assetsToRender = childAssetsByParentId.get(parentId) || [];
 
-    const { assets: filteredAssets } = loadedChildren[parentId];
-
-    return filteredAssets
+    return assetsToRender
       .filter((asset) => shouldShowAsset(asset))
       .map((asset) => {
-        const isLeaf = !assets.some((child) => child.parentId === asset.id);
+        const isLeaf = !(
+          (childAssetsByParentId.get(asset.id) ?? []).length > 0
+        );
         const itemType = getItemType(asset);
 
         return (
@@ -260,7 +285,7 @@ const AssetTree = ({
               !!(expandedNodes.has(asset.id) && anyFilterApplied)
             }
           >
-            {!isLeaf && loadedChildren[asset.id] && renderAssets(asset.id)}
+            {!isLeaf && expandedNodes.has(asset.id) && renderAssets(asset.id)}
           </TreeNode>
         );
       });
